@@ -32,8 +32,9 @@ function UTurnDuplicates(context, config) {
                 console.log('Connected to MongoDB DB!');
 
                 var aggregate_obj = [
-                    {"$group" : { "_id": "$email", "count": { "$sum": 1 }, "list": { "$push":{"_id":"$_id","name":"$name"} } } },
-                    {"$match": {"_id" :{ "$ne" : null } , "count" : {"$gt": 1} } }
+                    { $project : { _id : 1 , email : 1, emailLowercase : { $toLower: "$email" }, name: 1 } },
+                    { $group : { "_id": "$emailLowercase", "count": { "$sum": 1 }, "list": { $push:{"_id":"$_id","name":"$name","email":"$email"} } } },
+                    { $match: {"_id" :{ "$ne" : null } , "count" : {"$gt": 1} } }
                 ];
 
                 console.log('aggregate_obj:' + JSON.stringify(aggregate_obj) + ':');
