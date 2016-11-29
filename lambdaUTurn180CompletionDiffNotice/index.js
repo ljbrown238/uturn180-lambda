@@ -142,47 +142,49 @@ exports.handler = function (event, context, callback) {
                                         if (arrayLength == 0) {
                                             console.log('Success: No MongoDB records were returned.');
                                             context.done(null, 'Success: No MongoDB records were returned.');
-                                        }
 
-                                        var email_list = '';
+                                        } else {
 
-                                        for (var i = 0; i < arrayLength; i++) {
-                                            console.log('records[' + i + ']:' + JSON.stringify(records[i]) + ':');
-                                            console.log('records[' + i + '][email]:' + records[i]['email'] + ':');
+                                            var email_list = '';
 
-                                            email_list += records[i]['email'] + '\n';
-                                        }
+                                            for (var i = 0; i < arrayLength; i++) {
+                                                console.log('records[' + i + ']:' + JSON.stringify(records[i]) + ':');
+                                                console.log('records[' + i + '][email]:' + records[i]['email'] + ':');
 
-                                        console.log('MySQL email_list:' + email_list + ':');
+                                                email_list += records[i]['email'] + '\n';
+                                            }
 
-                                        // Send notice to SNS topic for email report generation
-                                        var sns = new AWS.SNS();
+                                            console.log('MySQL email_list:' + email_list + ':');
+
+                                            // Send notice to SNS topic for email report generation
+                                            var sns = new AWS.SNS();
 
 
-                                        msec_stop = get_msec();
-                                        console.log('msec_stop:' + msec_stop + ':');
+                                            msec_stop = get_msec();
+                                            console.log('msec_stop:' + msec_stop + ':');
 
-                                        var params = {
-                                            TopicArn: config.topic,
-                                            Subject: subject,
-                                            Message: message + email_list + '\n\n\nStatistics for monitoring DB impact:\n' +
+                                            var params = {
+                                                TopicArn: config.topic,
+                                                Subject: subject,
+                                                Message: message + email_list + '\n\n\nStatistics for monitoring DB impact:\n' +
                                                 'msec_mongodb_connect: ' + (msec_mongodb_connect - msec_start) + ' us\n' +
                                                 'msec_mongodb_query: ' + (msec_mongodb_query - msec_mongodb_connect) + ' us\n' +
                                                 'msec_mysql_connect: ' + (msec_mysql_connect - msec_mongodb_query) + ' us\n' +
                                                 'msec_mysql_query: ' + (msec_mysql_query - msec_mysql_connect) + ' us\n' +
                                                 'msec_total: ' + (msec_stop - msec_start) + ' us\n' +
                                                 'num_lms_students_completed_in_range: ' + numLMSStudentsCompleted + '\n'
-                                        };
+                                            };
 
-                                        sns.publish(params, function(err, data) {
-                                            if (err) {
-                                                console.log(err, err.stack);
-                                                context.done('Error:' + err + ':');
-                                            } else {
-                                                console.log('sns.publish:' + JSON.stringify(data) + ':');
-                                                context.done(null, 'Success: Email sent!');
-                                            }
-                                        });
+                                            sns.publish(params, function (err, data) {
+                                                if (err) {
+                                                    console.log(err, err.stack);
+                                                    context.done('Error:' + err + ':');
+                                                } else {
+                                                    console.log('sns.publish:' + JSON.stringify(data) + ':');
+                                                    context.done(null, 'Success: Email sent!');
+                                                }
+                                            });
+                                        }
 
                                     }
                                 );
