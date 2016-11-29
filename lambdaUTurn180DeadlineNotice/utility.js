@@ -1,5 +1,3 @@
-// utility.js
-// ========
 
 module.exports = {
     get_msec: function() {
