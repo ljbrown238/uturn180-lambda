@@ -1,4 +1,5 @@
 var AWS = require('aws-sdk');
+var utility = require('./utility');
 var mongoose = require('mongoose');
 var mysql = require('mysql');
 var Schema = mongoose.Schema;
@@ -18,7 +19,6 @@ function get_msec() {
 
 // Search Configuration
 var numDaysBack = 7;
-var statusSearch = "completed";
 var subject = 'REPORT: Users complete in LMS, but not complete in WP';
 var message = 'The following emails are from students whose LMS record has been updated in the last ' + numDaysBack + ' days and whose status is "completed", but whose status in WordPress is not "Completed" and not "Court reported":\n';
 
@@ -33,6 +33,14 @@ var studentSchema = new Schema({
 // Global variables
 var numLMSStudentsCompleted = 0;
 var config = {};
+
+if (!utility.is_lambda()) {
+    // Do this from CLI, but not from Lambda
+    AWS.config.region = 'us-west-2';
+
+    // To set for a particular service client
+    AWS.config.credentials = new AWS.SharedIniFileCredentials({profile: 'gdl_uturn180'});
+}
 
 var s3 = new AWS.S3();
 
@@ -65,7 +73,7 @@ exports.handler = function (event, context, callback) {
 
                     var studentModel = mongoose.model('Student', studentSchema, 'Student');
 
-                    studentModel.find({$and: [{status: statusSearch}, {lastModified: {$gte: new Date((new Date()) - 1000 * 60 * 60 * 24 * numDaysBack)}}]}, {email: 1}, function (err, db_students) {
+                    studentModel.find({$and: [{status: "completed"}, {lastModified: {$gte: new Date((new Date()) - 1000 * 60 * 60 * 24 * numDaysBack)}}]}, {email: 1}, function (err, db_students) {
 
                         if (err) {
                             console.log('Error: Failed to query DB');
@@ -124,7 +132,9 @@ exports.handler = function (event, context, callback) {
                                     console.log('Connected to MySQL DB!');
                                 }
 
-                                conn.query('SELECT email, status FROM wp_customer WHERE (status != 4) AND (status != 6) AND (email IN ' + email_list + ')',
+//                                SELECT email FROM wp_customer WHERE (status != 4) AND (status != 6) AND (email IN ' + email_list + ')',
+
+                                conn.query("SELECT email FROM wp_customer JOIN wp_customer_course on wp_customer.id = wp_customer_course.customer_id WHERE (status != 4) AND (status != 6) AND (course_type = 'Online') AND (email IN " + email_list + ")",
                                     function(err, records) {
 
                                         if(err){

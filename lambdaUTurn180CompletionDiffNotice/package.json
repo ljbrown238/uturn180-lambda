@@ -10,6 +10,7 @@
   "license": "ISC",
   "dependencies": {
     "mongoose": "^4.6.4",
+    "aws-sdk": "^2.6.12",
     "mysql": "^2.11.1"
   }
 }
