@@ -17,7 +17,7 @@ function get_msec() {
 }
 
 // Search Configuration
-var numDaysBack = 30;
+var numDaysBack = 7;
 var statusSearch = "completed";
 var subject = 'REPORT: Users complete in LMS, but not complete in WP';
 var message = 'The following emails are from students whose LMS record has been updated in the last ' + numDaysBack + ' days and whose status is "completed", but whose status in WordPress is not "Completed" and not "Court reported":\n';
