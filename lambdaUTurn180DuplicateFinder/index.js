@@ -149,14 +149,12 @@ exports.handler = function (event, local_context, callback) {
                 body += "\n\n\n";
                 body += "For Debug Reference:\n\n";
                 body += JSON.stringify(duplicate_users) + '\n';
-            } else {
-                body += 'NO duplicate users were discovered in the ' + s3_object_config.split("_")[1] + ' environment.\n';
+
+                console.log('Email body:' + body + ':');
+
+                // to, subject, body, callback
+                ses.sendMessage(to_array, 'UTurn180 LMS Duplicate User Query Result', body, getSendStatusMessageCallbackFunction(callback));
             }
-
-            console.log('Email body:' + body + ':');
-
-            // to, subject, body, callback
-            ses.sendMessage(to_array, 'UTurn180 LMS Duplicate User Query Result', body, getSendStatusMessageCallbackFunction(callback));
         }
     );
 
