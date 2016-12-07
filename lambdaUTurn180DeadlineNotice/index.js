@@ -7,6 +7,8 @@ var notices = require('./notices.json');
 var UTurnDeadlines = require('./uturndeadlines');
 var ses = require('./ses');
 
+// Send email to users whose LMS Enrolled document deadline is [7,2,1,0] days away
+
 // Provide context as a global variable for use in other functions
 var context;
 

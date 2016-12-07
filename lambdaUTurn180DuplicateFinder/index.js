@@ -6,6 +6,8 @@ var Schema = mongoose.Schema;
 var UTurnDuplicates = require('./uturnduplicates');
 var ses = require('./ses');
 
+// Description: LMS: More than one User document using the same email
+
 // Provide context as a global variable for use in other functions
 var context;
 
