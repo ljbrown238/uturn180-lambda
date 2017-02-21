@@ -1,3 +1,4 @@
+#!/usr/bin/env bash
 aws lambda invoke \
 --invocation-type RequestResponse \
 --function-name lambdaUTurn180CompletionDiffNotice \
